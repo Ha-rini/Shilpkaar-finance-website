@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="overall_financials.html">Overall Finances</a>
+            <a href="rajiben.html">Rajiben</a>
+            <a href="pratiba.html">Pratiba Tai</a>
+            <a href="login.html">Logout</a>
+            <div class="nav-search">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="dark-mode-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <h1>Orders Table</h1>
+        <button class="add-order" onclick="window.location.href='new_order.html'">+ Add Order</button>
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Order Date</th>
+                    <th>Order Details</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- <tr>
+                    <td></td>
+                </tr> -->
+                <tr>
+                    <td>1</td>
+                    <td>2024-07-29</td>
+                    <td>Order #1234: 10 Tote Bags</td>
+                    <td>Pending</td>
+                    <td>
+                        <button class="open-button">Open</button>
+                        <button class="edit-button">Edit</button>
+                        <button class="delete-button">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <script src="script.js"></script>
+</body>
+
+</html>

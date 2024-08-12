@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Confirm Order</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="dashboard.html">Home</a>
+            <a href="overall_financials.html">Overall Finances</a>
+            <a href="rajiben.html">Rajiben</a>
+            <a href="pratiba.html">Pratiba Tai</a>
+            <a href="login.html">Logout</a>
+            <div class="nav-search">
+                <input type="text" placeholder="Search">
+            </div>
+            <div class="dark-mode-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="confirm-container">
+            <h2>Current Order Details</h2>
+            <div class="flex-container">
+                <div class="box item-details">
+                    <h3>Item Details</h3>
+                    <p>Total Items: <span id="total-items">x</span></p>
+                    <ul id="item-list">
+                        <!-- Items will be populated here -->
+                    </ul>
+                    <textarea id="order-notes" placeholder="Notes"></textarea>
+                </div>
+                <div class="box cost-details">
+                    <h3>Cost Details</h3>
+                    <p>$<span id="total-cost">total</span></p>
+                    <ul>
+                        <li>Travel Cost</li>
+                        <li>Weaving</li>
+                        <li>Stitching</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="person-cost">
+                <div class="box person-box">
+                    <h4>Rajiben</h4>
+                    <ul>
+                        <li>Travel Cost</li>
+                        <li>Weaving</li>
+                        <li>Stitching</li>
+                        <li>Total Cost</li>
+                        <li>Profit</li>
+                    </ul>
+                </div>
+                <div class="box person-box">
+                    <h4>Pratiba Tai</h4>
+                    <ul>
+                        <li>Travel Cost</li>
+                        <li>Weaving</li>
+                        <li>Stitching</li>
+                        <li>Total Cost</li>
+                        <li>Profit</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-buttons">
+                <div class="form-actions">
+                    <button class="back-button" onclick="window.location.href='new_order.html'">Back</button>
+                    <button class="place-order-button" onclick="placeOrder()">Place Order</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const orderData = JSON.parse(localStorage.getItem('orderData'));
+
+            if (orderData) {
+                const items = orderData.items;
+                const notes = orderData.notes;
+
+                const itemList = document.getElementById('item-list');
+                const totalItems = document.getElementById('total-items');
+                const orderNotes = document.getElementById('order-notes');
+
+                totalItems.textContent = items.length;
+                orderNotes.value = notes;
+
+                items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `Item ${index + 1}: ${item.productType}, Quantity: ${item.quantity}, Dimensions: ${item.dimensions}, Sheet Type: ${item.sheetType}`;
+                    itemList.appendChild(li);
+                });
+            } else {
+                console.log('No order data found in local storage.');
+            }
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
