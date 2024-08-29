@@ -13,7 +13,7 @@
             <a href="overall_financials.html">Overall Finances</a>
             <a href="rajiben.html">Rajiben</a>
             <a href="pratiba.html">Pratiba Tai</a>
-            <a href="login.html">Logout</a>
+            <a href="index.html">Logout</a>
             <div class="nav-search">
                 <input type="text" placeholder="Search">
             </div>
@@ -70,6 +70,17 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="payment-made-by">
+                <label for="payment-made-by">Payment Made By:</label>
+                <select id="payment-made-by" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Garv">Garv</option>
+                    <option value="Bhavya">Bhavya</option>
+                    <option value="Atharv">Atharv</option>
+                </select>
+            </div>
+
             <div class="footer-buttons">
                 <div class="form-actions">
                     <button class="back-button" onclick="window.location.href='new_order.html'">Back</button>
@@ -103,6 +114,14 @@
                 console.log('No order data found in local storage.');
             }
         });
+
+        function placeOrder() {
+            const paymentMadeBy = document.getElementById('payment-made-by');
+            if (!paymentMadeBy.value) {
+                alert('Please select a payment made by option.');
+                return;
+            }
+        }
     </script>
     <script src="script.js"></script>
 </body>
