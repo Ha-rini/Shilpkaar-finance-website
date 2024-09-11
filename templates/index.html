@@ -2,20 +2,22 @@
 
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 
 <body>
-    <div class="login">
-        <div class="login-container">
-            <h1>Login</h1>
-            <label>Email</label>
-            <input type="email" id="email" required>
-            <label>Password</label>
-            <input type="password" id="email" required>
-            <button type="button" onclick="window.location.href='dashboard.html'">Login</button>
-            <a href="#">Forgot password?</a>
+    <form action="{{url_for('login')}}" method="POST">
+        <div class="login">
+            <div class="login-container">
+                <h1>Login</h1>
+                <label>Email</label>
+                <input type="text" id="email" name="log_email" required>
+                <label>Password</label>
+                <input type="password" id="email" name="password" required>
+                <button type="sumbit">Login</button>
+                <a href="#">Forgot password?</a>
+            </div>
         </div>
-    </div>
-    <script src="script.js"></script>
+    </form>
+    <script src="static/script.js"></script>
 </body>

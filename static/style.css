@@ -402,12 +402,12 @@ h4 {
 }
 
 input:checked+.slider {
-    background-image: url('images/moon.png');
+    background-image: url('templates/images/moon.png');
     background-size: 25px 25px;
 }
 
 input:not(:checked)+.slider {
-    background-image: url('images/sun.png');
+    background-image: url('templates/images/sun.png');
     background-size: 35px 35px;
 }
 
@@ -490,4 +490,22 @@ body.dark-mode .edit-button {
 body.dark-mode .delete-button {
     background-color: #e57373;
     color: black;
+}
+
+.payment-made-by {
+    margin-bottom: 20px;
+}
+
+.payment-made-by label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.payment-made-by select {
+    width: 15%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
