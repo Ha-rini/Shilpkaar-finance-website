@@ -1,7 +1,13 @@
 from flask_sqlalchemy import SQLAlchemy
-from extensions import db
+from app import app
 from werkzeug.security import generate_password_hash
 from datetime import datetime
+
+from werkzeug.security import generate_password_hash
+from datetime import datetime
+
+db=SQLAlchemy(app)
+
 
 #models
 
@@ -66,12 +72,12 @@ class Pratibatai(db.Model):
     order_id=db.Column(db.Integer,db.ForeignKey("order.id"))
     cost_id=db.Column(db.Integer,db.ForeignKey("cost.id"))
 
-# with app.app_context(): #only when flask server/ application is ready then create the tables
-#     db.create_all()
-#     admin=User.query.filter_by(is_admin=True).first()
-#     if not admin:
-#         admin1= User(username='bhavya',password=generate_password_hash('password'),is_admin=True)
-#         admin2= User(username='garv',password=generate_password_hash('password'),is_admin=True)
-#         db.session.add(admin1)
-#         db.session.add(admin2)
-#         db.session.commit()
+with app.app_context(): #only when flask server/ application is ready then create the tables
+    db.create_all()
+    admin=User.query.filter_by(is_admin=True).first()
+    if not admin:
+        admin1= User(username='bhavya',password=generate_password_hash('password'),is_admin=True)
+        admin2= User(username='garv',password=generate_password_hash('password'),is_admin=True)
+        db.session.add(admin1)
+        db.session.add(admin2)
+        db.session.commit()

@@ -1,16 +1,14 @@
 from flask import Flask,render_template,request,jsonify, redirect, session, url_for,flash
+from app import app
 from flask_restful import Api, Resource,reqparse,abort
 from models import db, User, Order, Product, Cost, Rajiben, Pratibatai
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
-import math
 from collections import Counter, defaultdict
 from sqlalchemy import or_,and_
+import math
 
-from werkzeug.utils import secure_filename
-
-from app import app
 
 
 def check_admin(func):
@@ -33,7 +31,7 @@ def check_admin(func):
 
 @app.route('/')
 def re():
-    return redirect(url_for('login'))
+    return render_template("index.html")
 
 
 @app.route('/login',methods=['GET','POST'])

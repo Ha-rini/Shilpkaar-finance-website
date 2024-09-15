@@ -402,12 +402,12 @@ h4 {
 }
 
 input:checked+.slider {
-    background-image: url('templates/images/moon.png');
+    background-image: url('static/images/moon.png');
     background-size: 25px 25px;
 }
 
 input:not(:checked)+.slider {
-    background-image: url('templates/images/sun.png');
+    background-image: url('static/images/sun.png');
     background-size: 35px 35px;
 }
 

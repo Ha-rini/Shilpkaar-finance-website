@@ -2,7 +2,7 @@
 
 <head>
     <title>Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 
 <body>
@@ -26,7 +26,7 @@
     </nav>
     <main>
         <h1>Orders Table</h1>
-        <button class="add-order" onclick="window.location.href='new_order.html'">+ Add Order</button>
+        <a href="{{url_for('new_order')}}"><button class="add-order">+ Add Order</button></a>
         <table class="dashboard-table">
             <thead>
                 <tr>
@@ -54,7 +54,7 @@
             </tbody>
         </table>
     </main>
-    <script src="script.js"></script>
+    <script src="static/script.js"></script>
 </body>
 
 </html>

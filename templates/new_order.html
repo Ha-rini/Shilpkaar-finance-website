@@ -3,7 +3,7 @@
 
 <head>
     <title>New Order</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
 
 <body>
@@ -30,7 +30,7 @@
         <div class="order-container">
             <h1>New Order</h1>
             <h2>Items</h2>
-            <form id="order-form">
+            <form id="order-form" action="confirm_order" method="POST"> 
                 <div class="form-group">
                     <label for="product-type">Product Type</label>
                     <select id="product-type" name="product_type">
@@ -108,7 +108,7 @@
             window.location.href = 'confirm_order.html';
         }
     </script>
-    <script src="script.js"></script>
+    <script src="static/script.js"></script>
 </body>
 
 </html>
