@@ -4,6 +4,7 @@
 <head>
     <title>New Order</title>
     <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -13,10 +14,9 @@
             <a href="overall_financials.html">Overall Finances</a>
             <a href="rajiben.html">Rajiben</a>
             <a href="pratiba.html">Pratiba Tai</a>
-            <a href="index.html">Logout</a>
-            <div class="nav-search">
-                <input type="text" placeholder="Search">
-            </div>
+            <a href="inventory.html">Inventory</a>
+            <a href="{{url_for('logout')}}">Logout</a>
+            
             <div class="dark-mode-toggle">
                 <label class="switch">
                     <input type="checkbox" id="dark-mode-switch">
@@ -30,26 +30,22 @@
         <div class="order-container">
             <h1>New Order</h1>
             <h2>Items</h2>
-            <form id="order-form" action="confirm_order" method="POST"> 
+            <form id="order-form" action="{{url_for('new_order')}}" method="POST"> 
                 <div class="form-group">
                     <label for="product-type">Product Type</label>
                     <select id="product-type" name="product_type">
                         <option value="">Choose product</option>
-                        <option value="tote-bag">Tote Bag</option>
-                        <option value="sling-bag">Sling Bag</option>
-                        <option value="pouch-">Pouch</option>
-                        <option value="lunch-bag">Lunch Bag</option>
-                        <option value="laptop-sleeve">Laptop Sleeve</option>
+                        <option value="Tote Bag">Tote Bag</option>
+                        <option value="Sling Bag">Sling Bag</option>
+                        <option value="Pouch">Pouch</option>
+                        <option value="Laptop Sleeve">Laptop Sleeve</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="quantity">Quantity</label>
                     <input type="number" id="quantity" name="quantity" value="0">
                 </div>
-                <div class="form-group">
-                    <label for="dimensions">Dimensions</label>
-                    <input type="text" id="dimensions" name="dimensions" placeholder="in x in">
-                </div>
+
                 <div class="form-group">
                     <label for="sheet-type">Sheet Type</label>
                     <select id="sheet-type" name="sheet_type">
@@ -63,9 +59,21 @@
                     <label for="notes">Notes</label>
                     <textarea id="notes" name="notes" placeholder="Value"></textarea>
                 </div>
+                <div class="payment-made-by">
+                    <label for="payment-made-by">Payment Made By:</label>
+                    <select id="payment-made-by" name="payment_made_by" required>
+                        <option value="" disabled selected>Select</option>
+                        <option value="Garv">Garv</option>
+                        <option value="Bhavya">Bhavya</option>
+                        <option value="Atharv">Atharv</option>
+                    </select>
+                </div>
+
+                <input type="hidden" id="items-json" name="items_json">
+
                 <div class="form-actions">
-                    <button type="button" class="cancel" onclick="window.location.href='dashboard.html'">Cancel</button>
-                    <button type="submit" class="confirm-order" onclick="confirmOrder()">Confirm Order</button>
+                    <a href="{{url_for('cancel_order')}}"><button type="button" class="cancel" >Cancel</button></a>
+                    <button type="submit" class="confirm-order">Confirm Order</button>
                 </div>
             </form>
         </div>
@@ -77,36 +85,36 @@
         function addItems() {
             const productType = document.getElementById('product-type').value;
             const quantity = document.getElementById('quantity').value;
-            const dimensions = document.getElementById('dimensions').value;
             const sheetType = document.getElementById('sheet-type').value;
 
-            if (productType && quantity && dimensions && sheetType) {
+            if (productType && quantity > 0 && sheetType) {
                 const item = {
                     productType,
                     quantity,
-                    dimensions,
                     sheetType
                 };
 
                 items.push(item);
                 console.log('Items:', items);
-                document.getElementById('order-form').reset();
+                document.getElementById('product-type').value = '';
+                document.getElementById('quantity').value = 0;
+                document.getElementById('sheet-type').value = '';
+
             } else {
                 alert('Please fill in all fields before adding an item.');
             }
-        }
+        };
 
-        function confirmOrder() {
-            event.preventDefault();
-            const notes = document.getElementById('notes').value;
-            const orderData = {
-                items,
-                notes
-            };
-            console.log(orderData);
-            localStorage.setItem('orderData', JSON.stringify(orderData));
-            window.location.href = 'confirm_order.html';
-        }
+        function prepareItems() {
+            // Convert items array to JSON and store it in the hidden input field
+            document.getElementById('items-json').value = JSON.stringify(items);
+        };
+
+        document.getElementById('order-form').onsubmit = function() {
+            prepareItems();
+        };
+        
+        
     </script>
     <script src="static/script.js"></script>
 </body>

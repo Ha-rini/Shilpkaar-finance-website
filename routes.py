@@ -1,7 +1,7 @@
-from flask import Flask,render_template,request,jsonify, redirect, session, url_for,flash
+from flask import Flask, json,render_template,request,jsonify, redirect, session, url_for,flash
 from app import app
 from flask_restful import Api, Resource,reqparse,abort
-from models import db, User, Order, Product, Cost, Rajiben, Pratibatai
+from models import db, User, Order, Product, Cost, Rajiben, Pratibatai,Product_type
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -55,182 +55,199 @@ def dashboard():
     orders=Order.query.all()
     return render_template('dashboard.html',orders=orders)
 
-
-# Sample product cost data from the image
-product_costs = {
-    'Tote Bag': {
-        'price': 700,
-        'raw_material': 50,
-        'weaving': 150,
-        'transport': 40,
-        'tailoring': 170,
-        'travels': 100,
+cost_details = {
+    "Tote Bag": {
+        "Raw Material": 50,
+        "Weaving": 150,
+        "Rajiben Profit": 70,
+        "Transport to Mumbai": 40,
+        "Tailoring Cost": 170,
+        "Pratibha Tai Profit": 60,
+        "Travels": 100,
+        "Total Cost": 640,
+        "Price of Product": 700
     },
-    'Pouch': {
-        'price': 450,
-        'raw_material': 25,
-        'weaving': 75,
-        'transport': 40,
-        'tailoring': 110,
-        'travels': 100,
+    "Pouch": {
+        "Raw Material": 25,
+        "Weaving": 75,
+        "Rajiben Profit": 35,
+        "Transport to Mumbai": 40,
+        "Tailoring Cost": 110,
+        "Pratibha Tai Profit": 39,
+        "Travels": 100,
+        "Total Cost": 424,
+        "Price of Product": 450
     },
-    'Sling': {
-        'price': 600,
-        'raw_material': 25,
-        'weaving': 75,
-        'transport': 40,
-        'tailoring': 220,
-        'travels': 100,
+    "Sling Bag": {
+        "Raw Material": 25,
+        "Weaving": 75,
+        "Rajiben Profit": 35,
+        "Transport to Mumbai": 40,
+        "Tailoring Cost": 220,
+        "Pratibha Tai Profit": 77,
+        "Travels": 100,
+        "Total Cost": 572,
+        "Price of Product": 600
     },
-    'Laptop': {
-        'price': 550,
-        'raw_material': 25,
-        'weaving': 75,
-        'transport': 40,
-        'tailoring': 170,
-        'travels': 100,
+    "Laptop Sleeve": {
+        "Raw Material": 25,
+        "Weaving": 75,
+        "Rajiben Profit": 35,
+        "Transport to Mumbai": 40,
+        "Tailoring Cost": 140,
+        "Pratibha Tai Profit": 105,
+        "Travels": 100,
+        "Total Cost": 520,
+        "Price of Product": 550
     }
 }
 
-@app.route('/new_order', methods=['GET', 'POST'])
+@app.route('/new_order',methods=['GET','POST'])
 @check_admin
 def new_order():
     if request.method == 'POST':
-        product_type = request.form.get('product_type')
-        quantity = int(request.form.get('quantity'))
-        sheet_type = request.form.get('sheet_type')
+        items_json = request.form.get('items_json')
+        items = []
+        if items_json:
+            items = json.loads(items_json)
+         
         notes = request.form.get('notes')
+        payment_made_by = request.form.get('payment_made_by')
+        print(items,notes,payment_made_by)
+        # Calculate and handle costs here
+        raw_material_cost=0
+        weaving_cost=0
+        transport_cost=0
+        rajiben_profit=0
+        rajiben_total=0
 
-        # Get the product details
-        product = product_costs.get(product_type)
-        if not product:
-            return redirect(url_for('new_order'))  # If invalid product, redirect
+        tailoring_cost=0
+        pratibatai_profit=0
+        pratibatai_total=0
 
-        # Calculate costs and profits for Rajiben and Pratibha Tai
-        raw_material_cost = product['raw_material'] * quantity
-        weaving_cost = product['weaving'] * quantity
-        transport_cost = product['transport'] * quantity
-        tailoring_cost = product['tailoring'] * quantity
-        travels_cost = product['travels'] * quantity
-        total_price = product['price'] * quantity
+        travels_cost=0
 
-        # Rajiben's profit: 35% of (raw material + weaving + transport)
-        rajiben_profit = math.ceil(0.35 * (raw_material_cost + weaving_cost + transport_cost))
+        total_cost = 0
+        for item in items:
+            # Cost calculation logic
+            qty = int(item['quantity'])
+            raw_material_cost+=int(cost_details[item["productType"]]["Raw Material"]*qty)
+            weaving_cost+=int(cost_details[item["productType"]]["Weaving"]*qty)
+            transport_cost+=int(cost_details[item["productType"]]["Transport to Mumbai"])
+            rajiben_profit+=int(cost_details[item["productType"]]["Rajiben Profit"]*qty)
+            rajiben_total+=int(raw_material_cost+weaving_cost+transport_cost+rajiben_profit)
 
-        # Pratibha Tai's profit: 35% of tailoring cost
-        pratibatai_profit = math.ceil(0.35 * tailoring_cost)
+            tailoring_cost+=int(cost_details[item["productType"]]["Tailoring Cost"]*qty)
+            pratibatai_profit+=int(cost_details[item["productType"]]["Pratibha Tai Profit"]*qty)
+            pratibatai_total+= tailoring_cost + pratibatai_profit
 
-        # Total cost
-        total_cost = (raw_material_cost + weaving_cost + transport_cost + tailoring_cost + travels_cost)
+            total_cost += int(cost_details[item["productType"]]["Price of Product"]*qty)
 
-        # Initialize the session storage if not present
-        if 'order_data' not in session:
-            session['order_data'] = {
-                'items': [],
-                'total_cost': 0,
-                'cost': {
-                    'raw_material_cost': 0,
-                    'weaving_cost': 0,
-                    'transport_cost': 0,
-                    'tailoring_cost': 0,
-                    'rajiben_profit': 0,
-                    'pratibatai_profit': 0
-                }
-            }
+        travels_cost= int(cost_details[item["productType"]]["Travels"])
 
-        # Append the current product to the session's 'items'
-        session['order_data']['items'].append({
-            'product_type': product_type,
-            'quantity': quantity,
-            'sheet_type': sheet_type,
-            'price': product['price'],
-            'total_price': total_price
-        })
-
-        # Update the session data for the overall costs
-        session['order_data']['total_cost'] += total_cost
-        session['order_data']['cost']['raw_material_cost'] += raw_material_cost
-        session['order_data']['cost']['weaving_cost'] += weaving_cost
-        session['order_data']['cost']['transport_cost'] += transport_cost
-        session['order_data']['cost']['tailoring_cost'] += tailoring_cost
-        session['order_data']['cost']['rajiben_profit'] += rajiben_profit
-        session['order_data']['cost']['pratibatai_profit'] += pratibatai_profit
-
-        return redirect(url_for('confirm_order'))
-    
-    return render_template('new_order.html')
-
-@app.route('/confirm_order', methods=['GET', 'POST'])
-@check_admin
-def confirm_order():
-    if request.method == 'POST':
-        order_data = session.get('order_data', {})
-
-        if not order_data or not order_data['items']:
-            return redirect(url_for('new_order'))  # Ensure there's valid order data
-
-        # Create and save the order in the database
         user = User.query.filter_by(username=session['username']).first()
-        if not user:
-            return redirect(url_for('login'))  # Ensure user exists
+        order = Order(user_id=user.id, date=datetime.now(), notes=notes, payment_made_by=payment_made_by, total_cost=total_cost)
+        db.session.add(order)
+        db.session.commit() 
 
-        # Create the order
-        new_order = Order(
-            date=datetime.utcnow(),
-            total_cost=order_data['total_cost'],
-            notes=order_data['notes'],
-            user_id=user.id
-        )
-        db.session.add(new_order)
-        db.session.commit()
-
-        # Add each product to the database
-        for item in order_data['items']:
-            product = Product(
-                product_type=item['product_type'],
-                sheet_type=item['sheet_type'],
-                quantity=item['quantity'],
-                price=item['price'],
-                total_price=item['total_price'],
-                order_id=new_order.id
-            )
+        # Create and commit Product objects for each item in the order
+        for item in items:
+            product_type = Product_type.query.filter_by(product_name=item['productType']).first()
+            product = Product(order_id=order.id, product_type=product_type.id, quantity=item['quantity'],
+                              price=product_type.product_price, sheet_type=item['sheetType'],
+                              total_price=int(item['quantity']) * product_type.product_price)
             db.session.add(product)
 
-        # Add cost details
-        cost = Cost(
-            raw_material_cost=order_data['cost']['raw_material_cost'],
-            weaving_cost=order_data['cost']['weaving_cost'],
-            transport_cost=order_data['cost']['transport_cost'],
-            tailoring_cost=order_data['cost']['tailoring_cost'],
-            rajiben_profit=order_data['cost']['rajiben_profit'],
-            pratibatai_profit=order_data['cost']['pratibatai_profit'],
-            total_cost=order_data['total_cost'],
-            order_id=new_order.id
-        )
+        # Generate and commit cost details
+        cost = Cost(raw_material_cost=raw_material_cost, weaving_cost=weaving_cost, transport_cost=transport_cost,
+                    tailoring_cost=tailoring_cost, rajiben_profit=rajiben_profit, pratibatai_profit=pratibatai_profit,
+                    travels=travels_cost, total_cost=total_cost,order_id=order.id)
         db.session.add(cost)
 
-        # Update Rajiben and Pratibha Tai's cumulative profits
-        rajiben = Rajiben.query.first()
-        pratibatai = Pratibatai.query.first()
-
-        rajiben.cumulative_profit += order_data['cost']['rajiben_profit']
-        pratibatai.cumulative_profit += order_data['cost']['pratibatai_profit']
-
+        # Rajiben and Pratibatai cost records
+        rajiben = Rajiben(cumulative_cost=rajiben_total, cumulative_profit=rajiben_profit, cost=cost)
+        pratibatai = Pratibatai(cumulative_cost=pratibatai_total, cumulative_profit=pratibatai_profit, cost=cost)
         db.session.add(rajiben)
         db.session.add(pratibatai)
 
+        # Commit everything at the end
         db.session.commit()
 
-        # Clear the session after successful save
-        session.pop('order_data', None)
+        session['items'] = items
+        session['notes'] = notes
+        session['total_cost'] = total_cost
+        session['rajiben_total'] = rajiben_total
+        session['rajiben_profit'] = rajiben_profit
+        session['pratibatai_total'] = pratibatai_total
+        session['pratibatai_profit'] = pratibatai_profit
+        session['travels_cost'] = travels_cost
+        session['cost'] = {
+                            'raw_material_cost': cost.raw_material_cost,
+                            'weaving_cost': cost.weaving_cost,
+                            'transport_cost': cost.transport_cost,
+                            'tailoring_cost': cost.tailoring_cost,
+                            'rajiben_profit': cost.rajiben_profit,
+                            'pratibatai_profit': cost.pratibatai_profit,
+                            'travels': cost.travels,
+                            'total_cost': cost.total_cost,
+                        }
+        return redirect(url_for('confirm_order'))
+    return render_template('new_order.html')
 
-        return redirect(url_for('dashboard'))
+@app.route('/confirm_order')
+def confirm_order():
+    # Fetch the necessary data from the session
+    items = session.get('items', [])
+    notes = session.get('notes', "")
+    total_cost = session.get('total_cost', 0)
+    rajiben_total = session.get('rajiben_total', 0)
+    rajiben_profit = session.get('rajiben_profit', 0)
+    pratibatai_total = session.get('pratibatai_total', 0)
+    pratibatai_profit = session.get('pratibatai_profit', 0)
+    travels_cost = session.get('travels_cost', 0)
+    cost = session.get('cost', {})# Travel cost
 
-    order_data = session.get('order_data', {})
-    return render_template('confirm_order.html', order=order_data)
+     # Clear session after fetching data
+    session.pop('items', None)
+    session.pop('notes', None)
+    session.pop('total_cost', None)
+    session.pop('rajiben_total', None)
+    session.pop('rajiben_profit', None)
+    session.pop('pratibatai_total', None)
+    session.pop('pratibatai_profit', None)
+    session.pop('travels_cost', None)
+    session.pop('cost', None)
+
+    # Render the 'confirm_order.html' template and pass all relevant data
+    return render_template('confirm_order.html', 
+                           items=items,  # List of items and their details
+                           notes=notes,  # Notes from the user
+                           total_cost=total_cost,  # Total cost for the entire order
+                           rajiben_total=rajiben_total,  # Rajiben's cumulative cost
+                           rajiben_profit=rajiben_profit,  # Rajiben's profit
+                           pratibatai_total=pratibatai_total,  # Pratibatai's cumulative cost
+                           pratibatai_profit=pratibatai_profit,  # Pratibatai's profit
+                           travels_cost=travels_cost,  # Travel cost
+                           cost=cost  # Cost object
+                          )
+
+@app.route('/cancel_order')
+def cancel_order():
+    # Clear session on order cancellation
+    session.pop('items', None)
+    session.pop('notes', None)
+    session.pop('total_cost', None)
+    session.pop('rajiben_total', None)
+    session.pop('rajiben_profit', None)
+    session.pop('pratibatai_total', None)
+    session.pop('pratibatai_profit', None)
+    session.pop('travels_cost', None)
+    session.pop('cost', None)
+
+    return redirect(url_for('dashboard'))  # Redirect to a dashboard or home page
 
 
-
+    
 @app.route('/overall_financials')
 @check_admin
 def overall_financials():

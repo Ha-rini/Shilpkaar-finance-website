@@ -12,10 +12,9 @@
             <a href="#" class="active">Overall Finances</a>
             <a href="rajiben.html">Rajiben</a>
             <a href="pratiba.html">Pratiba Tai</a>
-            <a href="index.html">Logout</a>
-            <div class="nav-search">
-                <input type="text" placeholder="Search">
-            </div>
+            <a href="inventory.html">Inventory</a>
+            <a href="{{url_for('logout')}}">Logout</a>
+            
             <div class="dark-mode-toggle">
                 <label class="switch">
                     <input type="checkbox" id="dark-mode-switch">
@@ -37,6 +36,7 @@
                     <th>Total Cost</th>
                     <th>Rajiben Amt Paid</th>
                     <th>Pratiba Tai Amt Paid</th>
+                    <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,6 +48,7 @@
                     <td>₹150</td>
                     <td>₹50</td>
                     <td>₹50</td>
+                    <td><button class="edit-button">Edit</button></td>
                 </tr>
             </tbody>
         </table>

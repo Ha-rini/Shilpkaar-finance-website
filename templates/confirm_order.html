@@ -3,20 +3,20 @@
 
 <head>
     <title>Confirm Order</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
     <nav>
         <div class="nav-links">
-            <a href="dashboard.html">Home</a>
+            <a href="{{ url_for('dashboard') }}">Home</a>
             <a href="overall_financials.html">Overall Finances</a>
             <a href="rajiben.html">Rajiben</a>
             <a href="pratiba.html">Pratiba Tai</a>
-            <a href="index.html">Logout</a>
-            <div class="nav-search">
-                <input type="text" placeholder="Search">
-            </div>
+            <a href="inventory.html">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
             <div class="dark-mode-toggle">
                 <label class="switch">
                     <input type="checkbox" id="dark-mode-switch">
@@ -30,99 +30,72 @@
         <div class="confirm-container">
             <h2>Current Order Details</h2>
             <div class="flex-container">
+                <!-- Item Details Section -->
                 <div class="box item-details">
                     <h3>Item Details</h3>
-                    <p>Total Items: <span id="total-items">x</span></p>
+                    <p>Total Items: {{ items|length }}</p>
                     <ul id="item-list">
-                        <!-- Items will be populated here -->
+                        {% for item in items %}
+                            <li>
+                                Item {{ loop.index }}: {{ item.productType }}, Quantity: {{ item.quantity }},
+                                Dimensions: {{ item.dimensions }}, Sheet Type: {{ item.sheetType }}
+                            </li>
+                        {% endfor %}
                     </ul>
-                    <textarea id="order-notes" placeholder="Notes"></textarea>
+                    <textarea id="order-notes" placeholder="Notes">{{ notes }}</textarea>
                 </div>
+
+                <!-- Cost Details Section -->
                 <div class="box cost-details">
                     <h3>Cost Details</h3>
-                    <p>$<span id="total-cost">total</span></p>
+                    <p><i class="fa fa-inr" aria-hidden="true"></i> {{ total_cost }}</p>
                     <ul>
-                        <li>Travel Cost</li>
-                        <li>Weaving</li>
-                        <li>Stitching</li>
+                        <li>Raw Material Cost: <i class="fa fa-inr"></i> {{ cost.raw_material_cost }}</li>
+                        <li>Weaving Cost: <i class="fa fa-inr"></i> {{ cost.weaving_cost }}</li>
+                        <li>Transport Cost:<i class="fa fa-inr"></i> {{ cost.transport_cost }}</li>
+                        <li>Tailoring Cost: <i class="fa fa-inr"></i> {{ cost.tailoring_cost }}</li>
+                        <li>Travel Cost: <i class="fa fa-inr"></i> {{ travels_cost }}</li>
+                        <li>Total Cost: <i class="fa fa-inr"></i> {{ cost.total_cost }}</li>
                     </ul>
                 </div>
             </div>
+
+            <!-- Artisan Cost Details Section -->
             <div class="person-cost">
+                <!-- Rajiben's Details -->
                 <div class="box person-box">
                     <h4>Rajiben</h4>
                     <ul>
-                        <li>Travel Cost</li>
-                        <li>Weaving</li>
-                        <li>Stitching</li>
-                        <li>Total Cost</li>
-                        <li>Profit</li>
+                        <li>Raw Material Cost: <i class="fa fa-inr"></i> {{ cost.raw_material_cost }}</li>
+                        <li>Weaving Cost: <i class="fa fa-inr"></i> {{ cost.weaving_cost }}</li>
+                        <li>Transport Cost:<i class="fa fa-inr"></i> {{ cost.transport_cost }}</li>
+                        <li>Profit: <i class="fa fa-inr"></i> {{ rajiben_profit }}</li>
+                        <li>Total Cost: <i class="fa fa-inr"></i> {{ rajiben_total }}</li>
                     </ul>
                 </div>
+
+                <!-- Pratiba Tai's Details -->
                 <div class="box person-box">
                     <h4>Pratiba Tai</h4>
                     <ul>
-                        <li>Travel Cost</li>
-                        <li>Weaving</li>
-                        <li>Stitching</li>
-                        <li>Total Cost</li>
-                        <li>Profit</li>
+                        <li>Tailoring Cost: <i class="fa fa-inr"></i> {{ cost.tailoring_cost }}</li>
+                        <li>Profit: <i class="fa fa-inr"></i> {{ pratibatai_profit }}</li>
+                        <li>Total Cost: <i class="fa fa-inr"></i> {{ pratibatai_total }}</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="payment-made-by">
-                <label for="payment-made-by">Payment Made By:</label>
-                <select id="payment-made-by" required>
-                    <option value="" disabled selected>Select</option>
-                    <option value="Garv">Garv</option>
-                    <option value="Bhavya">Bhavya</option>
-                    <option value="Atharv">Atharv</option>
-                </select>
-            </div>
-
+            <!-- Footer Buttons Section -->
             <div class="footer-buttons">
                 <div class="form-actions">
-                    <button class="back-button" onclick="window.location.href='new_order.html'">Back</button>
-                    <button class="place-order-button" onclick="placeOrder()">Place Order</button>
+                    <a href="{{ url_for('dashboard') }}">
+                        <button type="button" class="place-order-button">Back To Dashboard</button>
+                    </a>
                 </div>
             </div>
         </div>
     </main>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const orderData = JSON.parse(localStorage.getItem('orderData'));
-
-            if (orderData) {
-                const items = orderData.items;
-                const notes = orderData.notes;
-
-                const itemList = document.getElementById('item-list');
-                const totalItems = document.getElementById('total-items');
-                const orderNotes = document.getElementById('order-notes');
-
-                totalItems.textContent = items.length;
-                orderNotes.value = notes;
-
-                items.forEach((item, index) => {
-                    const li = document.createElement('li');
-                    li.textContent = `Item ${index + 1}: ${item.productType}, Quantity: ${item.quantity}, Dimensions: ${item.dimensions}, Sheet Type: ${item.sheetType}`;
-                    itemList.appendChild(li);
-                });
-            } else {
-                console.log('No order data found in local storage.');
-            }
-        });
-
-        function placeOrder() {
-            const paymentMadeBy = document.getElementById('payment-made-by');
-            if (!paymentMadeBy.value) {
-                alert('Please select a payment made by option.');
-                return;
-            }
-        }
-    </script>
     <script src="static/script.js"></script>
 </body>
 
