@@ -9,7 +9,7 @@
     <nav>
         <div class="nav-links">
             <a href="#" class="active">Home</a>
-            <a href="overall_financials.html">Overall Finances</a>
+            <a href="{{url_for('overall_financials')}}">Overall Finances</a>
             <a href="rajiben.html">Rajiben</a>
             <a href="pratiba.html">Pratiba Tai</a>
             <a href="inventory.html">Inventory</a>
@@ -39,17 +39,28 @@
                 </tr>
             </thead>
             <tbody>
+                {% for order in orders %}
                 <tr>
-                    <td>1</td>
-                    <td>2024-07-29</td>
-                    <td>Order #1234: 10 Tote Bags</td>
-                    <td>Garv</td>
-                    <td>Pending</td>
+                    <td>{{ loop.index }}</td> <!-- Display the order number -->
+                    <td>{{ order.date.strftime('%Y-%m-%d') }}</td> <!-- Display order date -->
                     <td>
-                        <button class="open-button">Open</button>
-                        <button class="delete-button">Delete</button>
+                        Order #{{ order.id }}: 
+                        {% for product in order.products %}
+                            <br>
+                            Product: {{ product.product_type.product_name }}, Quantity: {{ product.quantity }}, Sheet type: {{product.sheet_type}} Total: <i class="fa fa-inr" aria-hidden="true"></i> {{product.total_price}}
+                        {% endfor %}
+                    </td> <!-- Display order details -->
+                    <td>{{ order.payment_made_by }}</td> <!-- Display payment made by -->
+                    <td>{{ order.status or "Pending" }}</td> <!-- Display order status (default to "Pending") -->
+                    <td>
+                        <a href="#"><button class="open-button">Open</button></a>
+                        <form action="{{ url_for('delete_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                        
                     </td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
     </main>

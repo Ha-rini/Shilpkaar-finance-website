@@ -34,23 +34,46 @@
                     <th>Order Details</th>
                     <th>Cost Details</th>
                     <th>Total Cost</th>
-                    <th>Rajiben Amt Paid</th>
-                    <th>Pratiba Tai Amt Paid</th>
+                    <th>Rajiben <br>
+                        Amt Paid
+                    </th>
+                    <th>Pratiba Tai <br>
+                        Amt Paid
+                    </th>
                     <th>Edit</th>
                 </tr>
             </thead>
             <tbody>
+                {% for order in orders %}
                 <tr>
-                    <td>1</td>
-                    <td>2024-07-29</td>
-                    <td>Order #1234: 10 Tote Bags</td>
-                    <td>₹100</td>
-                    <td>₹150</td>
-                    <td>₹50</td>
-                    <td>₹50</td>
-                    <td><button class="edit-button">Edit</button></td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        Order #{{ order.id }}:
+                        {% for product in order.products %}
+                            <br><strong>Product:</strong> {{ product.product_type.product_name }},
+                            <strong>Quantity:</strong> {{ product.quantity }},
+                            <strong>Sheet Type:</strong> {{ product.sheet_type }} <br>
+                            <strong>Total:</strong> ₹{{ product.total_price }}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <strong>Raw Material:</strong> ₹{{ order.cost.raw_material_cost }} <br>
+                        <strong>Weaving:</strong> ₹{{ order.cost.weaving_cost }} <br>
+                        <strong>Transport:</strong> ₹{{ order.cost.transport_cost }} <br>
+                        <strong>Tailoring:</strong> ₹{{ order.cost.tailoring_cost }} <br>
+                        <strong>Travel:</strong> ₹{{ order.cost.travels }}
+                    </td>
+                    <td>₹{{ order.cost.total_cost }}</td>
+                    <td>₹{{ order.cost.rajiben_profit }}</td>
+                    <td>₹{{ order.cost.pratibatai_profit }}</td>
+                    <td>
+                        <a href="#"><button class="edit-button">Edit</button></a>
+                    </td>
                 </tr>
+                {% endfor %}
             </tbody>
+            
         </table>
     </main>
     <script src="static/script.js"></script>

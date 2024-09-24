@@ -153,7 +153,7 @@ def new_order():
         # Create and commit Product objects for each item in the order
         for item in items:
             product_type = Product_type.query.filter_by(product_name=item['productType']).first()
-            product = Product(order_id=order.id, product_type=product_type.id, quantity=item['quantity'],
+            product = Product(order_id=order.id, product_id=product_type.id, quantity=item['quantity'],
                               price=product_type.product_price, sheet_type=item['sheetType'],
                               total_price=int(item['quantity']) * product_type.product_price)
             db.session.add(product)
@@ -246,8 +246,23 @@ def cancel_order():
 
     return redirect(url_for('dashboard'))  # Redirect to a dashboard or home page
 
-
+@app.route('/delete_order/<int:order_id>', methods=['POST'])
+@check_admin
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
     
+    try:
+        # Delete the order and all its associated products
+        db.session.delete(order)
+        db.session.commit()
+        flash(f"Order {order_id} has been deleted successfully.", "success")
+    except Exception as e:
+        db.session.rollback()  # Rollback if there's any error
+        flash(f"Error occurred while deleting order {order_id}: {str(e)}", "danger")
+
+    return redirect(url_for('dashboard'))  # Redirect to dashboard after deletion
+
+
 @app.route('/overall_financials')
 @check_admin
 def overall_financials():

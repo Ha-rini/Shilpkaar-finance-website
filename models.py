@@ -26,6 +26,8 @@ class Product_type(db.Model):
     product_price=db.Column(db.Float,nullable=False)
     product_dimension=db.Column(db.String,nullable=False)
 
+    prods=db.relationship("Product",backref="product_type",lazy=True,cascade='all,delete-orphan')
+
 class Order(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     date=db.Column(db.Date,nullable=False)
@@ -35,8 +37,9 @@ class Order(db.Model):
     status=db.Column(db.String,default="order placed")
     user_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
 
-    items=db.relationship("Product",backref="order",lazy=True,cascade='all,delete-orphan')
-
+    products=db.relationship("Product",backref="order",lazy=True,cascade='all,delete-orphan')
+    cost=db.relationship("Cost",backref="order",uselist=False,lazy=True,cascade='all,delete-orphan')
+    
 class Product(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     sheet_type=db.Column(db.String,nullable=False)
@@ -45,7 +48,7 @@ class Product(db.Model):
     total_price=db.Column(db.Float,nullable=False)
     
     order_id=db.Column(db.Integer,db.ForeignKey("order.id"),nullable=False)
-    product_type = db.Column(db.Integer,db.ForeignKey("product_type.id"),nullable=False)
+    product_id = db.Column(db.Integer,db.ForeignKey("product_type.id"),nullable=False)
 
 class Cost(db.Model):
     id=db.Column(db.Integer,primary_key=True)
