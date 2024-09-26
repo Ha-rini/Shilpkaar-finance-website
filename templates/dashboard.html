@@ -2,18 +2,18 @@
 
 <head>
     <title>Dashboard</title>
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <nav>
         <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="{{url_for('overall_financials')}}">Overall Finances</a>
-            <a href="rajiben.html">Rajiben</a>
-            <a href="pratiba.html">Pratiba Tai</a>
-            <a href="inventory.html">Inventory</a>
-            <a href="{{url_for('logout')}}">Logout</a>
+            <a href="{{ url_for('dashboard') }}" class="active">Home</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
             
             
             <div class="dark-mode-toggle">
@@ -44,7 +44,6 @@
                     <td>{{ loop.index }}</td> <!-- Display the order number -->
                     <td>{{ order.date.strftime('%Y-%m-%d') }}</td> <!-- Display order date -->
                     <td>
-                        Order #{{ order.id }}: 
                         {% for product in order.products %}
                             <br>
                             Product: {{ product.product_type.product_name }}, Quantity: {{ product.quantity }}, Sheet type: {{product.sheet_type}} Total: <i class="fa fa-inr" aria-hidden="true"></i> {{product.total_price}}
@@ -53,7 +52,7 @@
                     <td>{{ order.payment_made_by }}</td> <!-- Display payment made by -->
                     <td>{{ order.status or "Pending" }}</td> <!-- Display order status (default to "Pending") -->
                     <td>
-                        <a href="#"><button class="open-button">Open</button></a>
+                        <a href="{{ url_for('view_order', order_id=order.id) }}"><button class="open-button">Open</button></a>
                         <form action="{{ url_for('delete_order', order_id=order.id) }}" method="POST" style="display:inline;">
                             <button type="submit" class="delete-button">Delete</button>
                         </form>

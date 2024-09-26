@@ -2,18 +2,18 @@
 
 <head>
     <title>Rajiben</title>
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <nav>
         <div class="nav-links">
-            <a href="dashboard.html">Home</a>
-            <a href="overall_financials.html">Overall Finances</a>
-            <a href="#" class="active">Rajiben</a>
-            <a href="pratiba.html">Pratiba Tai</a>
-            <a href="inventory.html">Inventory</a>
-            <a href="{{url_for('logout')}}">Logout</a>
+            <a href="{{ url_for('dashboard') }}">Home</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}" class="active">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
             
             <div class="dark-mode-toggle">
                 <label class="switch">

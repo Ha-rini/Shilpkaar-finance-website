@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Inventory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Home</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+            
+            <div class="dark-mode-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="order-container">
+            <h1>Edit Inventory</h1>
+            <h2>Product</h2>
+            <form id="order-form" action="{{ url_for('edit_inventory', inventory_id=inventory.id) }}" method="POST"> 
+                <div class="form-group">
+                    <label for="product-type">Product Type</label>
+                    <select id="product-type" name="product_type">
+                        <option value="">Choose product</option>
+                        <option value="Tote Bag" {% if inventory.product_name == 'Tote Bag' %}selected{% endif %} >Tote Bag</option>
+                        <option value="Sling Bag" {% if inventory.product_name == 'Sling Bag' %}selected{% endif %}>Sling Bag</option>
+                        <option value="Pouch" {% if inventory.product_name == 'Pouch' %}selected{% endif %}>Pouch</option>
+                        <option value="Laptop Sleeve" {% if inventory.product_name == 'Laptop Sleeve' %}selected{% endif %}>Laptop Sleeve</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sheet-type">Sheet Type</label>
+                    <select id="sheet-type" name="sheet_type">
+                        <option value="">Choose sheet</option>
+                        <option value="sheet1" {% if inventory.sheet_type == 'sheet1' %}selected{% endif %}>Sheet 1</option>
+                        <option value="sheet2" {% if inventory.sheet_type == 'sheet2' %}selected{% endif %}>Sheet 2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" name="quantity_in_stock" min="1" value="{{ inventory.quantity_in_stock }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date-received">Date Received</label>
+                    <input type="date" id="date-received" name="date_received" value="{{ inventory.date_received.strftime('%Y-%m-%d') }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="current-keeper">Current Holder</label>
+                    <input type="text" id="current-keeper" name="current_keeper" value="{{ inventory.current_keeper }}" required>
+                </div>
+                
+                <div class="form-actions">            
+                    <a href="{{ url_for('cancel_inventory') }}"><button type="button" class="cancel">Cancel</button></a>
+                    <button type="submit" class="confirm-order">Update Inventory</button>
+                </div>
+            </form>      
+        </div>
+    </main>
+    <script src="static/script.js"></script>
+</body>
+
+</html>

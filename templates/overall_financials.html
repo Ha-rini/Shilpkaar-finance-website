@@ -2,18 +2,18 @@
 
 <head>
     <title>Overall Finanicals</title>
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
     <nav>
         <div class="nav-links">
-            <a href="dashboard.html">Home</a>
-            <a href="#" class="active">Overall Finances</a>
-            <a href="rajiben.html">Rajiben</a>
-            <a href="pratiba.html">Pratiba Tai</a>
-            <a href="inventory.html">Inventory</a>
-            <a href="{{url_for('logout')}}">Logout</a>
+            <a href="{{ url_for('dashboard') }}">Home</a>
+            <a href="{{ url_for('overall_financials') }}" class="active">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
             
             <div class="dark-mode-toggle">
                 <label class="switch">
@@ -65,8 +65,8 @@
                         <strong>Travel:</strong> ₹{{ order.cost.travels }}
                     </td>
                     <td>₹{{ order.cost.total_cost }}</td>
-                    <td>₹{{ order.cost.rajiben_profit }}</td>
-                    <td>₹{{ order.cost.pratibatai_profit }}</td>
+                    <td>₹{{ order.cost.rajiben.cumulative_cost }}</td>
+                    <td>₹{{ order.cost.pratibatai.cumulative_cost }}</td>
                     <td>
                         <a href="#"><button class="edit-button">Edit</button></a>
                     </td>

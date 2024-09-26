@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Home</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}" class="active">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+            
+            
+            <div class="dark-mode-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+    <main>
+        <h1>Inventory Table</h1>
+        <a href="{{url_for('new_inventory')}}"><button class="add-order">+ Add Inventory</button></a>
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Receive Date</th>
+                    <th>Product Type</th>
+                    <th>Quantity</th>
+                    <th>Sheet Type</th>
+                    <th>Price</th>
+                    <th>Current Holder</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inventory in inventories %}
+                <tr>
+                    <td>{{ loop.index }}</td> <!-- Display the order number -->
+                    <td>{{ inventory.date_received.strftime('%Y-%m-%d') }}</td> <!-- Display order date -->
+                    <td>
+                        Product: {{ inventory.product_type.product_name }}                       
+                    </td> 
+                    <td>{{ inventory.quantity_in_stock }}</td> 
+                    <td>{{ inventory.sheet_type }}</td> 
+                    <td>{{ inventory.product_type.product_price * inventory.quantity_in_stock }}</td> 
+                    <td>{{ inventory.current_keeper }}</td> 
+                    <td>
+                        <a href="{{ url_for('edit_inventory', inventory_id=inventory.id) }}"><button class="edit-button">Edit</button></a>
+                        <form action="{{ url_for('delete_inventory', inventory_id=inventory.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+    <script src="static/script.js"></script>
+</body>
+
+</html>

@@ -3,7 +3,7 @@
 
 <head>
     <title>Confirm Order</title>
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
@@ -11,10 +11,10 @@
     <nav>
         <div class="nav-links">
             <a href="{{ url_for('dashboard') }}">Home</a>
-            <a href="overall_financials.html">Overall Finances</a>
-            <a href="rajiben.html">Rajiben</a>
-            <a href="pratiba.html">Pratiba Tai</a>
-            <a href="inventory.html">Inventory</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
             <a href="{{ url_for('logout') }}">Logout</a>
 
             <div class="dark-mode-toggle">
@@ -38,7 +38,7 @@
                         {% for item in items %}
                             <li>
                                 Item {{ loop.index }}: {{ item.productType }}, Quantity: {{ item.quantity }},
-                                Dimensions: {{ item.dimensions }}, Sheet Type: {{ item.sheetType }}
+                                Sheet Type: {{ item.sheetType }}
                             </li>
                         {% endfor %}
                     </ul>

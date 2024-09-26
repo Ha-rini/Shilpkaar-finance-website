@@ -1,7 +1,7 @@
 from flask import Flask, json,render_template,request,jsonify, redirect, session, url_for,flash
 from app import app
 from flask_restful import Api, Resource,reqparse,abort
-from models import db, User, Order, Product, Cost, Rajiben, Pratibatai,Product_type
+from models import db, User, Order, Product, Cost, Rajiben, Pratibatai,Product_type,Inventory
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from datetime import datetime
@@ -41,7 +41,7 @@ def login():
         password=request.form.get('password')
         user=User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password,password):
-            print("Incorrect credentials")
+            
             return redirect(url_for('login'))
         session['username']=username
         return redirect(url_for('dashboard'))
@@ -113,7 +113,7 @@ def new_order():
          
         notes = request.form.get('notes')
         payment_made_by = request.form.get('payment_made_by')
-        print(items,notes,payment_made_by)
+        
         # Calculate and handle costs here
         raw_material_cost=0
         weaving_cost=0
@@ -195,6 +195,7 @@ def new_order():
     return render_template('new_order.html')
 
 @app.route('/confirm_order')
+@check_admin
 def confirm_order():
     # Fetch the necessary data from the session
     items = session.get('items', [])
@@ -262,6 +263,40 @@ def delete_order(order_id):
 
     return redirect(url_for('dashboard'))  # Redirect to dashboard after deletion
 
+@app.route('/order/<int:order_id>', methods=['GET'])
+@check_admin
+def view_order(order_id):
+    # Fetch the specific order based on order_id
+    order = Order.query.get_or_404(order_id)
+
+    # Fetch associated products for the order
+    products = Product.query.filter_by(order_id=order.id).all()
+    items = [{
+        'productType': prod.product_type.product_name,
+        'quantity': prod.quantity,
+        'dimensions': prod.product_type.product_dimension,
+        'sheetType': prod.sheet_type
+    } for prod in products]
+
+    # Fetch associated cost details for the order
+    cost = Cost.query.filter_by(order_id=order.id).first()
+
+    # Rajiben and Pratiba Tai's financial details
+    rajiben = Rajiben.query.filter_by(cost_id=cost.id).first()
+    pratibatai = Pratibatai.query.filter_by(cost_id=cost.id).first()
+
+    # Pass order details to the confirm_order.html template
+    return render_template('confirm_order.html', 
+                           items=items,  # List of products in the order
+                           notes=order.notes,  # Notes from the user
+                           total_cost=order.total_cost,  # Total cost for the entire order
+                           rajiben_total=rajiben.cumulative_cost if rajiben else 0,  # Rajiben's cumulative cost
+                           rajiben_profit=rajiben.cumulative_profit if rajiben else 0,  # Rajiben's profit
+                           pratibatai_total=pratibatai.cumulative_cost if pratibatai else 0,  # Pratibatai's cumulative cost
+                           pratibatai_profit=pratibatai.cumulative_profit if pratibatai else 0,  # Pratibatai's profit
+                           travels_cost=cost.travels if cost else 0,  # Travel cost
+                           cost=cost  # Cost object
+                          )
 
 @app.route('/overall_financials')
 @check_admin
@@ -281,6 +316,90 @@ def pratiba():
     pratibatai_financials = Pratibatai.query.all()
     return render_template('pratibatai.html', orders=orders, pratibatai_financials=pratibatai_financials)
 
+@app.route('/inventory')
+@check_admin
+def inventory():
+    inventories=Inventory.query.all()
+    return render_template('inventory.html',inventories=inventories)
+
+@app.route('/new_inventory',methods=['GET','POST'])
+@check_admin
+def new_inventory():
+    if request.method == 'POST':
+        product_type = request.form.get('product_type')
+        sheet_type=request.form.get('sheet_type')
+        quantity_in_stock = request.form.get('quantity_in_stock')
+        date_received = request.form.get('date_received')
+        current_keeper = request.form.get('current_keeper')
+
+        product=Product_type.query.filter_by(product_name=product_type).first()
+        # Convert date from string to datetime object
+        date_received_obj = datetime.strptime(date_received, '%Y-%m-%d')
+
+        # Create a new Inventory entry
+        new_inventory_item = Inventory(
+            product_name=product.product_name,  # optional, if you want to keep this field
+            sheet_type=sheet_type,  
+            quantity_in_stock=quantity_in_stock,
+            date_received=date_received_obj,
+            current_keeper=current_keeper,
+            product_type_id=product.id
+        )
+
+        # Add to the database
+        db.session.add(new_inventory_item)
+        db.session.commit()
+
+        return redirect(url_for('inventory'))
+    
+    return render_template('new_inventory.html')
+
+# Route to handle cancelling inventory input
+@app.route('/cancel_inventory', methods=['GET'])
+@check_admin
+def cancel_inventory():
+    return redirect(url_for('inventory'))
+
+@app.route('/edit_inventory/<int:inventory_id>', methods=['GET', 'POST'])
+@check_admin
+def edit_inventory(inventory_id):
+    inventory_item = Inventory.query.get(inventory_id)
+
+    if request.method == 'POST':
+        # Get updated values from the form
+        product_type = request.form.get('product_type')
+        sheet_type=request.form.get('sheet_type')
+        quantity_in_stock = request.form.get('quantity_in_stock')
+        date_received = request.form.get('date_received')
+        current_keeper = request.form.get('current_keeper')
+        
+        product=Product_type.query.filter_by(product_name=product_type).first()
+        # Update the inventory item
+        inventory_item.product_name = product_type
+        inventory_item.sheet_type=sheet_type
+        inventory_item.quantity_in_stock = quantity_in_stock
+        inventory_item.date_received = datetime.strptime(date_received, '%Y-%m-%d')
+        inventory_item.current_keeper = current_keeper
+        inventory_item.product_type_id=product.id
+
+        # Commit the changes to the database
+        db.session.commit()
+        return redirect(url_for('inventory'))
+
+    # Render the edit form with existing inventory item values
+    return render_template('edit_inventory.html', inventory=inventory_item)
+
+@app.route('/delete_inventory/<int:inventory_id>', methods=['POST'])
+@check_admin
+def delete_inventory(inventory_id):
+    # Find the inventory item by ID
+    inventory_item = Inventory.query.get(inventory_id)
+
+    if inventory_item:
+        db.session.delete(inventory_item)  # Delete the item from the database
+        db.session.commit()  # Commit the changes
+
+    return redirect(url_for('inventory'))  # Redirect to the inventory dashboard
 
 
 # Route for logging out

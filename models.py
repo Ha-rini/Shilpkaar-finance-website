@@ -4,8 +4,6 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 from flask_migrate import Migrate
 
-from werkzeug.security import generate_password_hash
-from datetime import datetime
 
 db=SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -27,6 +25,7 @@ class Product_type(db.Model):
     product_dimension=db.Column(db.String,nullable=False)
 
     prods=db.relationship("Product",backref="product_type",lazy=True,cascade='all,delete-orphan')
+    inventory = db.relationship('Inventory', backref='product_type',lazy=True,cascade='all,delete-orphan')
 
 class Order(db.Model):
     id=db.Column(db.Integer,primary_key=True)
@@ -62,8 +61,8 @@ class Cost(db.Model):
     total_cost=db.Column(db.Float,nullable=False)
     order_id=db.Column(db.Integer,db.ForeignKey("order.id"),nullable=False)
 
-    rajiben=db.relationship("Rajiben", backref="cost", lazy=True, cascade='all,delete-orphan')
-    pratibatai=db.relationship("Pratibatai", backref="cost", lazy=True, cascade='all,delete-orphan')
+    rajiben=db.relationship("Rajiben",uselist=False, backref="cost", lazy=True, cascade='all,delete-orphan')
+    pratibatai=db.relationship("Pratibatai",uselist=False, backref="cost", lazy=True, cascade='all,delete-orphan')
 
 
 class Rajiben(db.Model):
@@ -77,6 +76,19 @@ class Pratibatai(db.Model):
     cumulative_cost=db.Column(db.Float,nullable=False)
     cumulative_profit=db.Column(db.Float,nullable=False)
     cost_id=db.Column(db.Integer,db.ForeignKey("cost.id"),nullable=False)
+
+class Inventory(db.Model):
+    __tablename__ = 'inventory'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date_received=db.Column(db.Date,nullable=False)
+    product_name = db.Column(db.String(100), nullable=False)
+    sheet_type = db.Column(db.String(100), nullable=False)
+    quantity_in_stock = db.Column(db.Integer, nullable=False)
+    current_keeper = db.Column(db.String(50), nullable=False)
+    
+    # Relationships
+    product_type_id = db.Column(db.Integer, db.ForeignKey('product_type.id'), nullable=True)
 
 with app.app_context(): #only when flask server/ application is ready then create the tables
     db.create_all()
