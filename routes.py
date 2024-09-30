@@ -389,6 +389,7 @@ def new_inventory():
         date_received_obj = datetime.strptime(date_received, '%Y-%m-%d')
 
         # If "Other (please specify)" is selected, use the additional option
+        
         if sheet_type == 'Other (please specify)' and additional_option:
             sheet_type = additional_option
         
@@ -427,10 +428,15 @@ def edit_inventory(inventory_id):
         # Get updated values from the form
         product_type = request.form.get('product_type')
         sheet_type=request.form.get('sheet_type')
+        additional_option = request.form.get('additional_option')
+        
         quantity_in_stock = request.form.get('quantity_in_stock')
         date_received = request.form.get('date_received')
         current_keeper = request.form.get('current_keeper')
         
+        if sheet_type == 'Other (please specify)' and additional_option:
+            sheet_type = additional_option
+            
         product=Product_type.query.filter_by(product_name=product_type).first()
         # Update the inventory item
         inventory_item.product_name = product_type

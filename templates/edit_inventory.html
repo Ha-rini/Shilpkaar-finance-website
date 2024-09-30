@@ -47,9 +47,21 @@
                     <label for="sheet-type">Sheet Type</label>
                     <select id="sheet-type" name="sheet_type">
                         <option value="">Choose sheet</option>
-                        <option value="sheet1" {% if inventory.sheet_type == 'sheet1' %}selected{% endif %}>Sheet 1</option>
-                        <option value="sheet2" {% if inventory.sheet_type == 'sheet2' %}selected{% endif %}>Sheet 2</option>
+                        <option value="Azure Blue & Black">Azure Blue & Black</option>
+                        <option value="Blue Gradient">Blue Gradient</option>
+                        <option value="Emerald Green Gradient">Emerald Green Gradient</option>
+                        <option value="Multicolored & White">Multicolored & White</option>
+                        <option value="Dark Blue & White Stripes">Dark Blue & White Stripes</option>
+                        <option value="Black & White Stripes">Black & White Stripes</option>
+                        <option value="Starry Night (Black & White)">Starry Night (Black & White)</option>
+                        <option value="Rainbow Collection">Rainbow Collection</option>
+                        <option value="Black, Gold & White">Black, Gold & White</option>
+                        <option value="Blue, Silver & White">Blue, Silver & White</option>
+                        <option value="Rainbow Stripes">Rainbow Stripes</option>
+                        <option value="Blue & White Wave Dashes">Blue & White Wave Dashes</option>
+                        <option value="Other (please specify)">Other (please specify)</option>
                     </select>
+                    <input type="text" id="additional-option" name="additional_option" placeholder="Type additional option here" style="display:none;"/>
                 </div>
 
                 <div class="form-group">
@@ -75,6 +87,21 @@
         </div>
     </main>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const sheetTypeSelect = document.getElementById('sheet-type');
+            const additionalOptionInput = document.getElementById('additional-option');
+    
+            sheetTypeSelect.addEventListener('change', function() {
+                if (this.value === 'Other (please specify)') {
+                    additionalOptionInput.style.display = 'block';
+                } else {
+                    additionalOptionInput.style.display = 'none';
+                    additionalOptionInput.value = ''; // Clear the input if a different option is selected
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
