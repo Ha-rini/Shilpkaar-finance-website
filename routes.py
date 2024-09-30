@@ -304,17 +304,67 @@ def overall_financials():
     orders = Order.query.all()
     return render_template('overall_financials.html', orders=orders)
 
+from flask import render_template, request, redirect, url_for, flash
+from sqlalchemy.orm.exc import NoResultFound
+
+from flask import render_template, request, redirect, url_for, flash
+
+@app.route('/edit_financials/<int:order_id>', methods=['GET', 'POST'])
+def edit_financials(order_id):
+    order = Order.query.get_or_404(order_id)
+
+    if request.method == 'POST':
+        # Get new values from the form
+        rajiben_amt_paid = float(request.form['rajiben_amt_paid'])
+        pratibatai_amt_paid = float(request.form['pratibatai_amt_paid'])
+
+        # Update Rajiben's cumulative cost and profit
+        if order.cost.rajiben:
+            rajiben = order.cost.rajiben
+            rajiben.cumulative_cost = rajiben_amt_paid
+            rajiben.cumulative_profit = rajiben_amt_paid - (order.cost.raw_material_cost + order.cost.weaving_cost + order.cost.transport_cost + order.cost.rajiben_profit)
+        else:
+            # Create a new entry if not already present
+            rajiben = Rajiben(
+                cumulative_cost=rajiben_amt_paid,
+                cumulative_profit=rajiben_amt_paid - (order.cost.raw_material_cost + order.cost.weaving_cost + order.cost.transport_cost + order.cost.rajiben_profit),
+                cost_id=order.cost.id
+            )
+            db.session.add(rajiben)
+
+        # Update Pratiba Tai's cumulative cost and profit
+        if order.cost.pratibatai:
+            pratibatai = order.cost.pratibatai
+            pratibatai.cumulative_cost = pratibatai_amt_paid
+            pratibatai.cumulative_profit = pratibatai_amt_paid - (order.cost.tailoring_cost + order.cost.pratibatai_profit)
+        else:
+            # Create a new entry if not already present
+            pratibatai = Pratibatai(
+                cumulative_cost=pratibatai_amt_paid,
+                cumulative_profit=pratibatai_amt_paid - (order.cost.tailoring_cost + order.cost.pratibatai_profit),
+                cost_id=order.cost.id
+            )
+            db.session.add(pratibatai)
+
+        # Commit the changes to the database
+        db.session.commit()
+        
+        return redirect(url_for('overall_financials'))
+
+    # Render the edit financials form, passing the order object
+    return render_template('edit_financials.html', order=order)
+
+
+
 @app.route('/rajiben')
 def rajiben():
-    orders = Order.query.all()
-    rajiben_financials = Rajiben.query.all()
-    return render_template('rajiben.html', orders=orders, rajiben_financials=rajiben_financials)
+    rajiben_orders = Rajiben.query.all()  # or filter based on the requirement
+    return render_template('rajiben.html', rajiben_orders=rajiben_orders)
 
 @app.route('/pratiba')
 def pratiba():
-    orders = Order.query.all()
-    pratibatai_financials = Pratibatai.query.all()
-    return render_template('pratibatai.html', orders=orders, pratibatai_financials=pratibatai_financials)
+    pratibatai_orders = Pratibatai.query.all()  # or filter based on the requirement
+    return render_template('pratibatai.html', pratibatai_orders=pratibatai_orders)
 
 @app.route('/inventory')
 @check_admin
@@ -322,23 +372,29 @@ def inventory():
     inventories=Inventory.query.all()
     return render_template('inventory.html',inventories=inventories)
 
-@app.route('/new_inventory',methods=['GET','POST'])
+@app.route('/new_inventory', methods=['GET', 'POST'])
 @check_admin
 def new_inventory():
     if request.method == 'POST':
         product_type = request.form.get('product_type')
-        sheet_type=request.form.get('sheet_type')
-        quantity_in_stock = request.form.get('quantity_in_stock')
+        sheet_type = request.form.get('sheet_type')
+        additional_option = request.form.get('additional_option')
+        quantity_in_stock = request.form.get('quantity_in_stock', type=int)
         date_received = request.form.get('date_received')
         current_keeper = request.form.get('current_keeper')
 
-        product=Product_type.query.filter_by(product_name=product_type).first()
+        product = Product_type.query.filter_by(product_name=product_type).first()
+        
         # Convert date from string to datetime object
         date_received_obj = datetime.strptime(date_received, '%Y-%m-%d')
 
+        # If "Other (please specify)" is selected, use the additional option
+        if sheet_type == 'Other (please specify)' and additional_option:
+            sheet_type = additional_option
+        
         # Create a new Inventory entry
         new_inventory_item = Inventory(
-            product_name=product.product_name,  # optional, if you want to keep this field
+            product_name=product.product_name,  # Optional, if you want to keep this field
             sheet_type=sheet_type,  
             quantity_in_stock=quantity_in_stock,
             date_received=date_received_obj,
@@ -350,9 +406,11 @@ def new_inventory():
         db.session.add(new_inventory_item)
         db.session.commit()
 
-        return redirect(url_for('inventory'))
+        # Redirect to the inventory page after successfully adding the item
+        return redirect(url_for('inventory'))  # Change 'inventory' to the correct endpoint name if necessary
     
     return render_template('new_inventory.html')
+
 
 # Route to handle cancelling inventory input
 @app.route('/cancel_inventory', methods=['GET'])

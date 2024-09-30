@@ -509,3 +509,26 @@ body.dark-mode .delete-button {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+
+.edit-financials {
+    display: flex;
+    flex-direction: column; /* Stacks fields vertically */
+    justify-content: center; /* Centers content vertically */
+    align-items: center; /* Centers content horizontally */
+    min-height: 100vh; /* Full viewport height */
+    padding: 20px; /* Optional: add some padding */
+}
+
+.edit-financials form {
+    width: 100%; /* Take full width */
+    max-width: 600px; /* Optional: Limit maximum width */
+    margin: 0; /* Remove margin to center correctly */
+    display: flex; /* Enables flex layout for the form */
+    flex-direction: column; /* Stack form fields vertically */
+    align-items: stretch; /* Aligns children to take full width */
+}
+
+.edit-financials .form-group {
+    width: 100%; /* Ensure each form group takes full width */
+}

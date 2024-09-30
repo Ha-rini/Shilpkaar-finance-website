@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-
+<html lang="en">
 <head>
-    <title>Rajiben</title>
+    <title>Rajiben Financials</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -25,7 +25,9 @@
     </nav>
 
     <main>
-        <h1>Rajiben Table</h1>
+        <h1>Rajiben Financials</h1>
+
+        <!-- Display Rajiben Table -->
         <table class="rajiben-table">
             <thead>
                 <tr>
@@ -39,11 +41,40 @@
                 </tr>
             </thead>
             <tbody>
+                {% for order in rajiben_orders %}
                 <tr>
-                    <td></td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.cost.order.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% for product in order.cost.order.products %}
+                            <strong>Product:</strong> {{ product.product_type.product_name }},
+                            <strong>Quantity:</strong> {{ product.quantity }},
+                            <strong>Sheet Type:</strong> {{ product.sheet_type }} <br>
+                            <strong>Total:</strong> ₹{{ product.total_price }}
+                            <br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <strong>Raw Material:</strong> ₹{{ order.cost.raw_material_cost }} <br>
+                        <strong>Weaving:</strong> ₹{{ order.cost.weaving_cost }} <br>
+                        <strong>Transport:</strong> ₹{{ order.cost.transport_cost }} <br>
+                        <strong>Tailoring:</strong> ₹{{ order.cost.tailoring_cost }} <br>
+                    </td>
+                    <td>{{ order.cost.raw_material_cost + order.cost.weaving_cost + order.cost.transport_cost }}</td>
+                    <td>{{ order.cost.rajiben.cumulative_profit }}</td>
+                    <td>{{ order.cost.rajiben.cumulative_cost }}</td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No data available</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
+
+        
     </main>
-    <script src="static/script.js"></script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+</html>

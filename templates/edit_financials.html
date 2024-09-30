@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Financials for Order #{{ order.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <nav>
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Home</a>
+            <a href="{{ url_for('overall_financials') }}">Overall Finances</a>
+            <a href="{{ url_for('rajiben') }}">Rajiben</a>
+            <a href="{{ url_for('pratiba') }}">Pratiba Tai</a>
+            <a href="{{ url_for('inventory') }}">Inventory</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+
+            <div class="dark-mode-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="dark-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="order-container">
+                <h1>Edit Financials</h1>
+
+                <section class="order-details">
+                    <h2>Order Details</h2>
+                    <div class="form-group">
+                        <label for="order-date">Order Date:</label>
+                        <input type="text" id="order-date" value="{{ order.date.strftime('%Y-%m-%d') }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="payment-made-by">Payment Made By:</label>
+                        <input type="text" id="payment-made-by" value="{{ order.payment_made_by }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="order-notes">Notes:</label>
+                        <textarea id="order-notes" disabled>{{ order.notes or 'None' }}</textarea>
+                    </div>
+                </section>
+
+                <section class="form-group">
+                    <h2>Products</h2>
+                    <ul>
+                        {% for product in order.products %}
+                        <li>
+                            <strong>Product:</strong> {{ product.product_type.product_name }}<br>
+                            <strong>Quantity:</strong> {{ product.quantity }}<br>
+                            <strong>Sheet Type:</strong> {{ product.sheet_type }}<br>
+                            <strong>Price:</strong> ₹{{ product.price }}<br>
+                            <strong>Total Price:</strong> ₹{{ product.total_price }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <p><strong>Total Order Cost:</strong> ₹{{ order.total_cost }}</p>
+                </section>
+
+                <section class="form-group">
+                    <h2>Cost Details</h2>
+                    <div class="form-group">
+                        <label for="raw-material-cost">Raw Material Cost:</label>
+                        <input type="text" id="raw-material-cost" value="₹{{ order.cost.raw_material_cost }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weaving-cost">Weaving Cost:</label>
+                        <input type="text" id="weaving-cost" value="₹{{ order.cost.weaving_cost }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transport-cost">Transport Cost:</label>
+                        <input type="text" id="transport-cost" value="₹{{ order.cost.transport_cost }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tailoring-cost">Tailoring Cost:</label>
+                        <input type="text" id="tailoring-cost" value="₹{{ order.cost.tailoring_cost }}" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="travel-cost">Travel Cost:</label>
+                        <input type="text" id="travel-cost" value="₹{{ order.cost.travels }}" disabled>
+                    </div>
+
+                    <p><strong>Total Cost:</strong> ₹{{ order.cost.total_cost }}</p>
+                </section>
+
+                <section class="form-group">
+                    <h2>Edit Rajiben and Pratibatai Amounts Paid</h2>
+                    <form action="{{ url_for('edit_financials', order_id=order.id) }}" method="POST">
+                        <div class="form-group">
+                            <label for="rajiben-amt-paid">Rajiben Amount Paid:</label>
+                            <input type="number" step="0.01" name="rajiben_amt_paid" id="rajiben-amt-paid"
+                                   value="{{ order.cost.rajiben.cumulative_cost if order.cost.rajiben else 0 }}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pratibatai-amt-paid">Pratiba Tai Amount Paid:</label>
+                            <input type="number" step="0.01" name="pratibatai_amt_paid" id="pratibatai-amt-paid"
+                                   value="{{ order.cost.pratibatai.cumulative_cost if order.cost.pratibatai else 0 }}" required>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="{{ url_for('overall_financials') }}"><button type="button" class="cancel">Cancel</button></a>
+                            <button type="submit" class="confirm-order">Save Changes</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

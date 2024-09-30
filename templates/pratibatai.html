@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-    <title>Pratiba</title>
+    <title>Pratiba Tai</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -39,9 +39,31 @@
                 </tr>
             </thead>
             <tbody>
+                {% for order in pratibatai_orders %}
                 <tr>
-                    <td></td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ order.cost.order.date.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        {% for product in order.cost.order.products %}
+                            <strong>Product:</strong> {{ product.product_type.product_name }},
+                            <strong>Quantity:</strong> {{ product.quantity }},
+                            <strong>Sheet Type:</strong> {{ product.sheet_type }} <br>
+                            <strong>Total:</strong> ₹{{ product.total_price }}
+                            <br>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <strong>Tailoring:</strong> ₹{{ order.cost.tailoring_cost }} <br>
+                    </td>
+                    <td>{{ order.cost.tailoring_cost }}</td>
+                    <td>{{ order.cost.pratibatai.cumulative_profit }}</td>
+                    <td>{{ order.cost.pratibatai.cumulative_cost }}</td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">No data available</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </main>
