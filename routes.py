@@ -143,7 +143,7 @@ def new_order():
 
             total_cost += int(cost_details[item["productType"]]["Price of Product"]*qty)
 
-        travels_cost= int(cost_details[item["productType"]]["Travels"])
+            travels_cost= int(cost_details[item["productType"]]["Travels"])
 
         user = User.query.filter_by(username=session['username']).first()
         order = Order(user_id=user.id, date=datetime.now(), notes=notes, payment_made_by=payment_made_by, total_cost=total_cost)
