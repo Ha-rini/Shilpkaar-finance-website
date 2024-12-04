@@ -94,8 +94,8 @@ with app.app_context(): #only when flask server/ application is ready then creat
     db.create_all()
     admin=User.query.filter_by(is_admin=True).first()
     if not admin:
-        admin1= User(username='bhavya',password=generate_password_hash('password'),is_admin=True)
-        admin2= User(username='garv',password=generate_password_hash('password'),is_admin=True)
+        admin1= User(username='bhavya',password=generate_password_hash('***'),is_admin=True)
+        admin2= User(username='garv',password=generate_password_hash('***'),is_admin=True)
         db.session.add(admin1)
         db.session.add(admin2)
         db.session.commit()
